@@ -43,7 +43,9 @@ module.exports = {
           }
         },
         {
-          sync: {force: true}
+          sync: {force: true},
+          charset: 'utf8',
+          collate: 'utf8_unicode_ci'
         }
     );
   },

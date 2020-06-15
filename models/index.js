@@ -3,7 +3,15 @@ const Sequelize = require('sequelize');
 
 //Heroku Postgres DB or SQLite DB
 const url = process.env.DATABASE_URL || "sqlite:quiz.sqlite";
-const options = {logging: false};
+const options = {
+                  define: {
+                    charset: 'utf8',
+                    dialectOptions: {
+                      collate: 'utf8_general_ci'
+                    }
+                  },
+                  logging: false
+                };
 const sequelize = new Sequelize(url, options);
 
 // Import the definition of the Quiz Table from quiz.js
