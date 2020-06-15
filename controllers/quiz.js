@@ -143,11 +143,12 @@ exports.subjectTests = (req, res, next) => {
 exports.playTest = (req, res, next) => {
   const subject = req.params.subject;
   const desc = req.params.desc;
+  let random_fun=(process.env.DATABASE_URL)?'RAND':'RANDOM';    // Chapuza para altenar entre sqlite y mysql
   let test = [];
   models.quiz.findAll({
     where: {subject: subject,
             desc: desc},
-    order: [Sequelize.fn( 'RANDOM' ),]
+    order: [Sequelize.fn( random_fun ),]
   }).then(questions => {
     test = questions;
     req.session.test = test;
