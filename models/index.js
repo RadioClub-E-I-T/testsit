@@ -2,8 +2,16 @@ const path = require('path');
 const Sequelize = require('sequelize');
 
 //Heroku Postgres DB or SQLite DB
-const url = process.env.DATABASE_URL || "sqlite:testsitdb.sqlite";
-const options = {logging: false};
+const url = process.env.DATABASE_URL || "sqlite:quiz.sqlite";
+const options = {
+                  define: {
+                    charset: 'utf8',
+                    dialectOptions: {
+                      collate: 'utf8_general_ci'
+                    }
+                  },
+                  logging: false
+                };
 const sequelize = new Sequelize(url, options);
 
 // Subject

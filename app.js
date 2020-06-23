@@ -9,6 +9,7 @@ var session = require('express-session');
 var SequelizeStore = require('connect-session-sequelize')(session.Store);
 var flash = require('express-flash');
 var logger = require('morgan');
+var redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 
 var indexRouter = require('./routes/index');
 var app = express();
@@ -23,19 +24,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-//Set static folder 
+//Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-//Uso de https en heroku
-if(app.get('env') === 'production'){
-  app.use((req,res,next) => {
-    if(req.headers['x-forwarded-proto'] !== 'https'){
-      res.redirect('https://' + req.get('Host') + req.url);
-    }else{
-      next();
-    }
-  });
-}
+// Redirect HTTP to HTTPS.
+// Don't redirect if the hostname is localhost:port (port=3000,5000)
+app.use(redirectToHTTPS([/localhost:(\d{4})/], [], 301));
 
 //Almacenamiento de session en BBDD
 var sequelize = require("./models");

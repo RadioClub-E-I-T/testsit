@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  webserver:
+    build: .
+    container_name: 'testsit-web'
+    restart: 'always'
+    ports:
+      - "3000:3000"
+    links:
+      - mysql
+    volumes:
+      - ${DOCUMENT_ROOT-.}:/usr/src/app
+    environment:
+      - MYSQL_HOST=testsit-db
+      - MYSQL_TESTSIT_DATABASE=testsit_database
+      - MYSQL_TESTSIT_USER=root
+      - MYSQL_TESTSIT_PASSWORD=tiger
+      - DATABASE_URL=mysql://testsit:testsit@mysql:3306/testsit_database
+  mysql:
+    image: mysql:5.7
+    container_name: 'testsit-db'
+    restart: 'always'
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: tiger
+      MYSQL_DATABASE: testsit_database
+      MYSQL_USER: testsit
+      MYSQL_PASSWORD: testsit
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: 'testsit-phpmyadmin'
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - '8080:80'
+    volumes:
+      - /sessions

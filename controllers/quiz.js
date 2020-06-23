@@ -119,7 +119,7 @@ exports.checkQuiz = (req, res, next) => {
 	if(!quiz){
 		return res.render(`El quiz ${req.params.quizId} no existe.`);
 	}
-	  
+
 	if(Number(quiz.answer) === Number(answer)){
 		name = 'hits';
 		result = 'hit';
@@ -150,7 +150,7 @@ exports.checkQuiz = (req, res, next) => {
 							quiz[name]++;
 							quiz.nTries++;
 							quiz['n'+answer]++;
-							
+
 							quiz.save({fields: ["nTries","hits","fails","n"+answer]})
 							.then(() => {
 								subject = quiz.subject;
@@ -175,7 +175,7 @@ exports.editQuiz = (req, res, next) => {
 	const quiz = req.quiz;
 	const testid = quiz.testid;
 	const subject = quiz.subject;
-	
+
 	Test.findByPk(testid)
 	.then(test => {
 		if(!quiz){
