@@ -13,10 +13,10 @@ exports.load = (req, res, next, quizId) => {
 
     Quiz.findByPk(quizId)
     .then(quiz => {
-        if (quiz) {
+        if(quiz){
             req.quiz = quiz;
             next();
-        } else {
+        }else{
             throw new Error('There is no quiz with id=' + quizId);
         }
     })

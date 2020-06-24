@@ -59,25 +59,31 @@ exports.checkTest = async (req, res, next) => {
   let N = Object.keys(test.quizzes).length;
 
   for (var i = 0; i < N; i++) {
-    var quiz = test.quizzes[i]; 
-    var omission,hit,fail = 0;
+    var omission = 0;
+    var hit = 0;
+    var fail = 0;
     var answer_sel = Number(answers['answer'+ i]);
-    if(answers['answer'+ i] === '0'){
+
+    test.quizzes[i].nTries++;
+    test.quizzes[i]['n'+answer_sel]++;
+    if(answer_sel === 0){
       test.quizzes[i].result = 'na';
+      test.quizzes[i].omissions++;
       nonanswered++;
       omission = 1;
-    }else if( Number(test.quizzes[i].answer) === answer_sel ){
+    }else if(answer_sel === Number(test.quizzes[i].answer)){
       test.quizzes[i].result = 'hit';
+      test.quizzes[i].hits++;
       correct++;
       hit = 1;
-    }else if( Number(test.quizzes[i].answer) !== answer_sel ){
+    }else if(answer_sel !== Number(test.quizzes[i].answer)){
       test.quizzes[i].result = 'fail';
+      test.quizzes[i].fails++;
       incorrect++;
       fail = 1;
     }
 
-    /*
-    await Quiz.findByPk(quiz.id)
+    await Quiz.findByPk(test.quizzes[i].id)
     .then(quiz => {
       quiz.nTries++;
       quiz.hits += hit;
@@ -85,9 +91,14 @@ exports.checkTest = async (req, res, next) => {
       quiz.omissions += omission;
       quiz['n'+answer_sel]++;
       quiz.save({fields: ["nTries","hits","fails","omissions","n"+answer_sel]})
-    })
-    */
+    });
   }
+
+  //Test stats
+  test.nTries++;
+  test.hits += correct;
+  test.fails += incorrect;
+  test.omissions += nonanswered;
 
   Test.findByPk(testid)
   .then(test_to_update => {
