@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Redirect HTTP to HTTPS.
 // Don't redirect if the hostname is localhost:port (port=3000,5000)
-app.use(redirectToHTTPS([/localhost:(\d{4})/], [], 301));
+//app.use(redirectToHTTPS([/localhost:(\d{4})/], [], 301));
 
 //Almacenamiento de session en BBDD
 var sequelize = require("./models");

@@ -90,12 +90,14 @@ module.exports = {
               allowNull: false
           },
           updatedAt: {
-              type: Sequelize.DATE,
-              allowNull: false
+            type: Sequelize.DATE,
+            allowNull: false
           }
         },
         {
-          sync: {force: true}
+          sync: {force: true},
+          charset: 'utf8',
+          collate: 'utf8_general_ci'
         }
     );
   },

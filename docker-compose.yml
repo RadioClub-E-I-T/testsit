@@ -8,17 +8,13 @@ services:
     ports:
       - "3000:3000"
     links:
-      - mysql
-    volumes:
-      - ${DOCUMENT_ROOT-.}:/usr/src/app
+      - mariadb
+    #volumes:
+    #  - ${DOCUMENT_ROOT-.}:/usr/src/app
     environment:
-      - MYSQL_HOST=testsit-db
-      - MYSQL_TESTSIT_DATABASE=testsit_database
-      - MYSQL_TESTSIT_USER=root
-      - MYSQL_TESTSIT_PASSWORD=tiger
-      - DATABASE_URL=mysql://testsit:testsit@mysql:3306/testsit_database
-  mysql:
-    image: mysql:5.7
+      - DATABASE_URL=mysql://testsit:testsit@mariadb:3306/testsit_database
+  mariadb:
+    image: mariadb:10.3
     container_name: 'testsit-db'
     restart: 'always'
     ports:
@@ -32,9 +28,9 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: 'testsit-phpmyadmin'
     links:
-      - mysql
+      - mariadb
     environment:
-      PMA_HOST: mysql
+      PMA_HOST: mariadb
       PMA_PORT: 3306
     ports:
       - '8080:80'

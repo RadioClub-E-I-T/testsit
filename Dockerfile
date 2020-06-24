@@ -23,6 +23,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "seed" ]
-CMD [ "npm", "run", "migrate" ]
-CMD [ "npm", "run", "super" ]
+CMD [ "npm", "start" ]

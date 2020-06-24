@@ -1,0 +1,15 @@
+[submodule ".deploy/custom/ea4rct"]
+	path = .deploy/custom/ea4rct
+	url = https://git.radio.clubs.etsit.upm.es/junta/anarres_conf.git
+[submodule ".deploy/roles/letsencrypt-request"]
+	path = .deploy/roles/letsencrypt-request
+	url = https://github.com/anarres-org/letsencrypt-request.git
+[submodule ".deploy/roles/add_nginx_proxy_conf"]
+	path = .deploy/roles/add_nginx_proxy_conf
+	url = https://github.com/anarres-org/add_nginx_proxy_conf.git
+[submodule ".deploy/roles/anarres-common"]
+	path = .deploy/roles/anarres-common
+	url = https://github.com/anarres-org/anarres-common.git
+[submodule ".deploy/roles/generic_docker_systemd"]
+	path = .deploy/roles/generic_docker_systemd
+	url = https://github.com/anarres-org/generic_docker_systemd.git

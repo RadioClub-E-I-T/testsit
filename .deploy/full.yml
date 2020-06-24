@@ -1,0 +1,104 @@
+---
+
+# Deploy testsit DB (MYSQL WITH phpmyadmin)
+
+- name: Deploy testsit db in docker
+  hosts: delta
+  become: true
+  gather_facts: false
+  vars:
+    service_name: testsit-phpmyadmin
+    create_network: true
+    docker_network_name: "{{ testsit_network_name }}"
+    service_db_name: testsit-db
+    enable_db: true
+    db_type: mariadb
+    docker_service_directory_db: "{{ testsit_db_directory.db }}"
+    docker_image: "{{ testsit_db_phpmyadmin_image }}"
+    docker_db_image: "{{ testsit_db_image }}"
+    docker_command: |
+      /usr/bin/docker run --rm --name "{{ service_name }}" \
+      -p "{{ testsit_db_web_port }}:80" \
+      -e PMA_HOST="{{ service_db_name }}" \
+      -e PMA_PORT=3306 \
+      --network "{{ testsit_network_name }}" \
+      "{{ docker_image }}"
+    db_pass: "{{ testsit_db_pass }}"
+    db_user_pass: "{{ testsit_db_user_pass }}"
+    db_name: "{{ testsit_db_name }}"
+    db_user: "{{ testsit_db_user }}"
+    db_config_port: 3306
+    db_expose_port: 3306
+
+  pre_tasks:
+    - name: Create testsit directories 755
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ user_uid_1000 }}"
+        group: "{{ group_gid_1000 }}"
+        mode: 0700
+      with_items:
+        - "{{ testsit_directory.data }}"
+        - "{{ testsit_db_directory.db }}"
+  roles:
+    - role: generic_docker_systemd
+  tags: [ never, testsit_db ]
+
+## Deploy TESTSIT https://github.com/alejp1998/testsit
+
+- name: Deploy testsit webserver in docker
+  hosts: delta
+  become: true
+  gather_facts: false
+  vars:
+    service_name: testsit_webserver
+    create_network: false
+    enable_db: false
+    docker_image: "{{ lookup('env','TESTSIT_WEBSERVER_IMAGE') | default(testsit_webserver_image, true) }}"
+    docker_command: |
+      /usr/bin/docker run --rm --name "{{ service_name }}" \
+      -p "{{ testsit_webserver_external_port }}:3000" \
+      --network "{{ testsit_network_name }}" \
+      -e DATABASE_URL="mysql://{{ testsit_db_user }}:{{ testsit_db_user_pass }}@testsit-db:3306/{{ testsit_db_name }}" \
+      -e GIT_TAG="{{ lookup('env','DRONE_TAG') }}" \
+      "{{ docker_image }}"
+  roles:
+    - role: generic_docker_systemd
+  tags: [ never, testsit_webserver ]
+
+- name: Get testsit webserver subdomain Let's Encrypt certificate
+  hosts: delta
+  become: true
+  gather_facts: false
+  vars:
+    domain: "{{ testsit_webserver_domain }}"
+    letsencrypt_renew_hook: /usr/sbin/service nginx reload
+  roles:
+    - role: letsencrypt-request
+      tags: letsecrypt_request
+  tags: [ never, testsit_webserver ]
+
+- name: Configure nginx proxy for testsit
+  hosts: delta
+  become: true
+  gather_facts: false
+  vars:
+    domain: "{{ testsit_webserver_domain }}"
+    binded_port: "{{ testsit_webserver_external_port }}"
+  roles:
+    - role: add_nginx_proxy_conf
+      tags: proxy
+  tags: [ never, testsit_webserver ]
+
+- name: Reload systemd
+  hosts: delta
+  become: true
+  gather_facts: false
+  tasks:
+  - name: restart systemd service
+    systemd:
+      name: docker.testsit_webserver.service
+      state: restarted
+      daemon_reload: yes
+  tags: [ never, testsit_webserver ]
